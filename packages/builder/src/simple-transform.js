@@ -13,11 +13,10 @@ export class SimpleTransform {
     const ty = this.ty;
 
     if (a == 0) {
-      console.warn("Can't invert transform with zero scale");
-      return new this.constructor(a, tx, ty);
+      throw new Error("Can't invert transform with zero scale");
     }
 
-    return new this.constructor(
+    return new SimpleTransform(
       1 / a,
       1 / a * -tx,
       1 / a * -ty
@@ -25,7 +24,7 @@ export class SimpleTransform {
   }
 
   concat(t) {
-    return new this.constructor(
+    return new SimpleTransform(
       this.a * t.a,
       this.a * t.tx + this.tx,
       this.a * t.ty + this.ty
@@ -33,7 +32,7 @@ export class SimpleTransform {
   }
 
   scale(s) {
-    return new this.constructor(
+    return new SimpleTransform(
       this.a * s,
       this.tx,
       this.ty
@@ -41,7 +40,7 @@ export class SimpleTransform {
   }
 
   translate(dx, dy) {
-    return new this.constructor(
+    return new SimpleTransform(
       this.a,
       this.a * dx + this.tx,
       this.a * dy + this.ty
