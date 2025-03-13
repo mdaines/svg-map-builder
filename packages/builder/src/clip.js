@@ -124,7 +124,7 @@ function clipLine(geom, newGeom, k1, k2, axis, isPolygon) {
 
 function clipLines(geom, newGeom, k1, k2, axis, isPolygon) {
     for (const line of geom) {
-        clipLine(line, newGeom, k1, k2, axis, isPolygon, false);
+        clipLine(line, newGeom, k1, k2, axis, isPolygon);
     }
 }
 
