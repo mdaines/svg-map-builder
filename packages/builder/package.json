@@ -1,0 +1,23 @@
+{
+  "name": "@mdaines/svg-map-builder",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": "./index.js",
+  "dependencies": {
+    "@mapbox/vector-tile": "^2.0.3",
+    "@turf/bbox": "^7.2.0",
+    "geojson-vt": "^4.0.2",
+    "pbf": "^4.0.1"
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.1",
+    "mocha": "^10.7.3",
+    "parcel": "^2.13.3",
+    "pmtiles": "^4.2.1"
+  },
+  "scripts": {
+    "test": "mocha --recursive --extension \".test.js\"",
+    "test-visual": "parcel serve --no-cache test/visual.html"
+  }
+}

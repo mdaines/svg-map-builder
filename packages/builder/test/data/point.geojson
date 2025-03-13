@@ -1,0 +1,67 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "id": "nihonbashi",
+      "type": "Feature",
+      "properties": {
+        "priority": 0,
+        "name": "Nihonbashi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          139.7744,
+          35.6840
+        ]
+      }
+    },
+    {
+      "id": "shizuoka",
+      "type": "Feature",
+      "properties": {
+        "priority": 1,
+        "name": "Shizuoka",
+        "number": 19
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.3889,
+          34.9717
+        ]
+      }
+    },
+    {
+      "id": "sanjo-ohashi",
+      "type": "Feature",
+      "properties": {
+        "priority": 2,
+        "name": "Sanjō Ōhashi"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          135.7722,
+          35.0091
+        ]
+      }
+    },
+    {
+      "id": "mt-fuji",
+      "type": "Feature",
+      "properties": {
+        "priority": 3,
+        "icon": "mountain",
+        "name": "Mt. Fuji"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          138.7275,
+          35.3606
+        ]
+      }
+    }
+  ]
+}

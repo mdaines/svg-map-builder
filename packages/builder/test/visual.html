@@ -1,0 +1,349 @@
+<!doctype html>
+<meta charset="utf-8">
+
+<style>
+  #examples {
+    display: grid;
+    grid-template-columns: max-content max-content;
+  }
+
+  #examples svg, #examples .info, #examples .error {
+    margin: 8px 0;
+  }
+
+  #examples .error {
+    background: pink;
+    grid-column: 2 / 3;
+  }
+</style>
+
+<div id="examples"></div>
+
+<script type="module">
+
+  import { Bounds } from "../src/bounds.js";
+  import { Layout } from "../src/layout.js";
+
+  function inspectBounds(bounds) {
+    return `x=${bounds.x} y=${bounds.y} width=${bounds.width} height=${bounds.height}`;
+  }
+
+  function renderRect(bounds, attributes) {
+    if (bounds.width == 0) {
+      bounds = bounds.insetBy(-0.5, 0);
+    }
+
+    if (bounds.height == 0) {
+      bounds = bounds.insetBy(0, -0.5);
+    }
+
+    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+
+    rect.setAttribute("x", bounds.x);
+    rect.setAttribute("y", bounds.y);
+    rect.setAttribute("width", bounds.width);
+    rect.setAttribute("height", bounds.height);
+
+    for (const [name, value] of Object.entries(attributes)) {
+      rect.setAttribute(name, value);
+    }
+
+    return rect;
+  }
+
+  function renderDefinition(title, definition) {
+    const fragment = document.createDocumentFragment();
+
+    const dt = document.createElement("dt");
+
+    dt.appendChild(document.createTextNode(title));
+
+    fragment.appendChild(dt);
+
+    const dd = document.createElement("dd");
+
+    dd.appendChild(document.createTextNode(definition));
+
+    fragment.appendChild(dd);
+
+    return fragment;
+  }
+
+  function renderExample(options) {
+    let layout;
+
+    try {
+      layout = Layout[options.method](options);
+    } catch (e) {
+      return renderError(e.message, options.label);
+    }
+
+    const geometryWorldBounds = options.bounds;
+    const label = options.label;
+
+    // world bounds in canvas coordinates
+
+    const worldBounds = layout.transform.convertBounds(new Bounds(0, 0, 1, 1));
+
+    // geometry bounds in canvas coordinates
+
+    let geometryBounds;
+
+    if (typeof geometryWorldBounds !== "undefined") {
+      geometryBounds = layout.transform.convertBounds(geometryWorldBounds);
+    }
+
+    // add margin so that background bounds is visible in the example
+
+    const marginBounds = layout.canvasBounds.insetBy(-10, -10);
+
+    // for clipping world rect, which could be very large
+
+    const clipBounds = marginBounds.insetBy(-10, -10);
+
+    // render
+
+    const fragment = document.createDocumentFragment();
+
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+
+    svg.setAttribute("width", marginBounds.width);
+    svg.setAttribute("height", marginBounds.height);
+    svg.setAttribute("viewBox", `${marginBounds.x} ${marginBounds.y} ${marginBounds.width} ${marginBounds.height}`);
+
+    svg.appendChild(renderRect(layout.canvasBounds, { fill: "#eee" }));
+
+    svg.appendChild(renderRect(layout.backgroundBounds, { fill: "#ddd", stroke: "#999" }));
+
+    for (const tileId of layout.tileIds) {
+      svg.appendChild(renderRect(layout.tileBounds(tileId), { fill: "none", stroke: "yellow" }));
+    }
+
+    if (typeof geometryBounds !== "undefined") {
+      svg.appendChild(renderRect(geometryBounds, { fill: "none", stroke: "green" }));
+    }
+
+    svg.appendChild(renderRect(worldBounds.intersection(clipBounds), { fill: "none", stroke: "blue" }));
+
+    fragment.appendChild(svg);
+
+
+    const div = document.createElement("div");
+
+    div.className = "info";
+
+    const heading = document.createElement("b");
+
+    heading.appendChild(document.createTextNode(label));
+
+    div.appendChild(heading);
+
+
+    const dl = document.createElement("dl");
+
+    dl.appendChild(renderDefinition("canvasBounds", inspectBounds(layout.canvasBounds)));
+
+    dl.appendChild(renderDefinition("backgroundBounds", inspectBounds(layout.backgroundBounds)));
+
+    dl.appendChild(renderDefinition("worldBounds", inspectBounds(worldBounds)));
+
+    dl.appendChild(renderDefinition("zoom", layout.zoom));
+
+    for (const tileId of layout.tileIds) {
+      dl.appendChild(renderDefinition("tile " + tileId, inspectBounds(layout.tileBounds(tileId))));
+    }
+
+    div.appendChild(dl);
+
+    fragment.appendChild(div);
+
+    return fragment;
+  }
+
+  function renderError(message, label) {
+    const div = document.createElement("div");
+
+    div.className = "error";
+
+    const heading = document.createElement("b");
+
+    heading.appendChild(document.createTextNode(label));
+
+    div.appendChild(heading);
+
+    const p = document.createElement("p");
+
+    p.appendChild(document.createTextNode(message));
+
+    div.appendChild(p);
+
+    return div;
+  }
+
+  const examples = [
+    renderExample({
+      method: "box",
+      label: "square",
+      bounds: new Bounds(0.5, 0.5, 0.6, 0.6),
+      width: 256,
+      height: 256,
+      padding: 64,
+      tileLength: 256
+    }),
+
+    renderExample({
+      method: "box",
+      label: "wide",
+      bounds: new Bounds(0.5, 0.5, 0.7, 0.6),
+      width: 256,
+      height: 256,
+      padding: 64,
+      tileLength: 256
+    }),
+
+    renderExample({
+      method: "box",
+      label: "tall",
+      bounds: new Bounds(0.5, 0.5, 0.6, 0.7),
+      width: 256,
+      height: 256,
+      padding: 64,
+      tileLength: 256
+    }),
+
+    renderExample({
+      method: "box",
+      label: "2/3",
+      bounds: new Bounds(0.5, 0.5, 0.6, 0.567),
+      width: 256,
+      height: 256,
+      padding: 64,
+      tileLength: 256
+    }),
+
+    renderExample({
+      method: "box",
+      label: "northwest",
+      bounds: new Bounds(0.0, 0.0, 0.1, 0.1),
+      width: 256,
+      height: 256,
+      padding: 64,
+      tileLength: 256
+    }),
+
+    renderExample({
+      method: "box",
+      label: "southeast",
+      bounds: new Bounds(0.9, 0.9, 1.0, 1.0),
+      width: 256,
+      height: 256,
+      padding: 64,
+      tileLength: 256
+    }),
+
+    renderExample({
+      method: "box",
+      label: "beyond east",
+      bounds: new Bounds(0.75, 0.25, 1.25, 0.75),
+      width: 256,
+      height: 256,
+      padding: 64,
+      tileLength: 256
+    }),
+
+    renderExample({
+      method: "box",
+      label: "beyond west",
+      bounds: new Bounds(-0.25, 0.25, 0.25, 0.75),
+      width: 256,
+      height: 256,
+      padding: 64,
+      tileLength: 256
+    }),
+
+    renderExample({
+      method: "box",
+      label: "wrapped",
+      bounds: new Bounds(0.0, 0.5, 1.0, 0.6),
+      width: 256,
+      height: 256,
+      padding: 64,
+      tileLength: 256
+    }),
+
+    renderExample({
+      method: "box",
+      label: "zero width",
+      bounds: new Bounds(0.5, 0.5, 0.5, 0.6),
+      width: 256,
+      height: 256,
+      padding: 64,
+      tileLength: 256
+    }),
+
+    renderExample({
+      method: "box",
+      label: "zero height",
+      bounds: new Bounds(0.5, 0.5, 0.6, 0.5),
+      width: 256,
+      height: 256,
+      padding: 64,
+      tileLength: 256
+    }),
+
+    renderExample({
+      method: "box",
+      label: "padding too large",
+      bounds: new Bounds(0.5, 0.5, 0.6, 0.6),
+      width: 256,
+      height: 256,
+      padding: 128,
+      tileLength: 256
+    }),
+
+    renderExample({
+      method: "box",
+      label: "point",
+      bounds: new Bounds(0.5, 0.5, 0.5, 0.5),
+      width: 256,
+      height: 256,
+      padding: 64,
+      tileLength: 256
+    }),
+
+    renderExample({
+      method: "box",
+      label: "null",
+      bounds: Bounds.null,
+      width: 256,
+      height: 256,
+      padding: 64,
+      tileLength: 256
+    }),
+
+    renderExample({
+      method: "camera",
+      label: "world",
+      center: { x: 0.5, y: 0.5 },
+      zoom: 0,
+      width: 256,
+      height: 256,
+      tileLength: 256
+    }),
+
+    renderExample({
+      method: "camera",
+      label: "northwest corner",
+      center: { x: 0.0, y: 0.0 },
+      zoom: 0,
+      width: 256,
+      height: 256,
+      tileLength: 256
+    })
+  ];
+
+  for (const example of examples) {
+    document.querySelector("#examples").appendChild(example);
+  }
+
+</script>

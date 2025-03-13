@@ -1,0 +1,7 @@
+{
+  "name": "@mdaines/svg-map-builder-root",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
+}
