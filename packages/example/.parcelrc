@@ -1,7 +1,0 @@
-{
-  "extends": "@parcel/config-default",
-  "transformers": {
-    "*.pmtiles": ["@parcel/transformer-raw"],
-    "*.geojson": ["@parcel/transformer-raw"]
-  }
-}

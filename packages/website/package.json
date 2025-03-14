@@ -1,0 +1,11 @@
+{
+  "name": "@mdaines/svg-map-builder-example",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@mdaines/svg-map-builder": "file:../builder",
+    "jsdom": "^25.0.1",
+    "pmtiles": "^4.2.1",
+    "w3c-xmlserializer": "^5.0.0"
+  }
+}

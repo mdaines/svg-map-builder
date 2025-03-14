@@ -12,6 +12,24 @@ const icons = {
     },
     width: 8,
     height: 8
+  }),
+
+  mountain: new Icon({
+    content: ({ document }) => {
+      const radius = 4;
+
+      const positions = [1, 5, 9].map(a => [
+        Number((Math.cos((a / 12) * 2 * Math.PI) * radius + radius).toFixed(2)),
+        Number((Math.sin((a / 12) * 2 * Math.PI) * radius + radius).toFixed(2))
+      ].join(",")).join(" ");
+
+      const triangle = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      triangle.setAttribute("d", `M ${positions} z`);
+
+      return triangle;
+    },
+    width: 8,
+    height: 8
   })
 };
 
@@ -24,7 +42,6 @@ function buildLayers(basemapArchive, routeSource, options) {
     }),
 
     new PathLayer({
-      visible: options.visibleLayers["landcover"],
       source: new VectorTileSource(basemapArchive, "landcover"),
       attributes: {
         fill: ({ get }) => {
@@ -49,7 +66,6 @@ function buildLayers(basemapArchive, routeSource, options) {
     }),
 
     new PathLayer({
-      visible: options.visibleLayers["water"],
       source: new VectorTileSource(basemapArchive, "water"),
       filter: ({ type }) => type === GeomType.POLYGON,
       attributes: {
@@ -58,18 +74,16 @@ function buildLayers(basemapArchive, routeSource, options) {
     }),
 
     new PathLayer({
-      visible: options.visibleLayers["roads"],
       source: new VectorTileSource(basemapArchive, "roads"),
       attributes: {
         fill: "none",
-        stroke: "#ffffff",
+        stroke: "#fff",
         strokeWidth: ({ get }) => get("kind") == "highway" ? 0.5 : 0.25,
         vectorEffect: "non-scaling-stroke"
       }
     }),
 
     new PathLayer({
-      visible: options.visibleLayers["boundaries"],
       source: new VectorTileSource(basemapArchive, "boundaries"),
       filter: ({ get }) => get("kind_detail") <= 2,
       attributes: {
@@ -82,7 +96,6 @@ function buildLayers(basemapArchive, routeSource, options) {
     }),
 
     new PathLayer({
-      visible: options.visibleLayers["boundaries"],
       source: new VectorTileSource(basemapArchive, "boundaries"),
       filter: ({ get }) => get("kind_detail") > 2,
       attributes: {
@@ -95,7 +108,6 @@ function buildLayers(basemapArchive, routeSource, options) {
     }),
 
     new PathLayer({
-      visible: options.visibleLayers["route"],
       source: routeSource,
       filter: ({ type }) => type === GeomType.LINESTRING,
       attributes: {
@@ -110,14 +122,9 @@ function buildLayers(basemapArchive, routeSource, options) {
     }),
 
     new MarkerLayer({
-      visible: options.visibleLayers["places"],
-      source: new VectorTileSource(basemapArchive, "places"),
-      filter: ({ get }) => get("kind") == "locality",
-      attributes: {
-        dataOverlap: ""
-      },
+      source: routeSource,
       icon: {
-        id: "circle",
+        id: ({ get }) => get("icon", "circle"),
         attributes: {
           fill: "#fff",
           stroke: "#000",
@@ -125,10 +132,10 @@ function buildLayers(basemapArchive, routeSource, options) {
         }
       },
       text: {
-        content: ({ id, get }) => get("name:en"),
+        content: ({ get }) => get("name"),
         attributes: {
           fontFamily: "helvetica, sans-serif",
-          fontSize: ({ get }) => get("population_rank") < 12 ? "11": "14",
+          fontSize: "14",
           textAnchor: "middle",
           fill: "#000",
           stroke: "#fff",
@@ -141,10 +148,10 @@ function buildLayers(basemapArchive, routeSource, options) {
   ];
 }
 
-export function buildMapImage(layout, basemapArchive, routeSource, options) {
+export function buildMapImage(layout, basemapArchive, routeSource) {
   return new MapImage({
     layout,
     icons,
-    layers: buildLayers(basemapArchive, routeSource, options)
+    layers: buildLayers(basemapArchive, routeSource)
   })
 }
