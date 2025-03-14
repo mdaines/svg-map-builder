@@ -1,4 +1,6 @@
-import { GeomType, BackgroundLayer, PathLayer, MarkerLayer, VectorTileSource, Icon, MapImage } from "@mdaines/svg-map-builder";
+import { readFileSync } from "node:fs";
+import { PMTiles } from "pmtiles";
+import { BackgroundLayer, GeomType, GeoJSONSource, Icon, Layout, MapImage, MarkerLayer, NodeFileArchiveSource, PathLayer, VectorTileSource } from "@mdaines/svg-map-builder";
 
 const icons = {
   circle: new Icon({
@@ -148,10 +150,26 @@ function buildLayers(basemapArchive, routeSource, options) {
   ];
 }
 
-export function buildMapImage(layout, basemapArchive, routeSource) {
-  return new MapImage({
+export function render(document) {
+  const basemapUrl = new URL("../data/basemap.pmtiles", import.meta.url);
+  const basemapArchive = new PMTiles(new NodeFileArchiveSource(basemapUrl));
+
+  const routeUrl = new URL("../data/tokaido.geojson", import.meta.url);
+  const routeData = readFileSync(routeUrl);
+  const routeSource = new GeoJSONSource(JSON.parse(routeData));
+
+  const layout = Layout.box({
+    bounds: routeSource.bounds,
+    width: 400,
+    height: 300,
+    padding: 40
+  });
+
+  const mapImage = new MapImage({
     layout,
     icons,
     layers: buildLayers(basemapArchive, routeSource)
-  })
+  });
+
+  return mapImage.render(document);
 }

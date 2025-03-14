@@ -1,14 +1,19 @@
 SVG Map Builder Example
 ==
 
+To build `map.svg`:
+
+    node src/build.js
+
+
 Basemap
---
+---
 
 This example uses the [Protomaps Basemap](https://docs.protomaps.com/basemaps/downloads). Since it shows a constrained area and uses only some of the layers, a partial download is used.
 
 To build `data/basemap.pmtiles`:
 
-    # Choose a build
+    # Choose a build from https://maps.protomaps.com/builds
     BASEMAP_DOWNLOAD_URL=...
 
     # Download the part we need
