@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { BackgroundLayer } from "../src/background-layer.js";
-import { Layout } from "../src/layout.js";
+import { BackgroundLayer } from "../lib/background-layer.js";
+import { Layout } from "../lib/layout.js";
 import { JSDOM } from "jsdom";
 import serialize from "w3c-xmlserializer";
 

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { Icon } from "../src/icon.js";
+import { Icon } from "../lib/icon.js";
 import { JSDOM } from "jsdom";
 
 describe("Icon", function() {

@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es2022",
+    "lib": ["es2022", "dom"],
+    "strict": true,
+    "module": "nodenext",
+    "verbatimModuleSyntax": true,
+    "allowJs": true,
+    "declaration": true,
+    "outDir": "lib"
+  },
+  "include": ["src/*"]
+}

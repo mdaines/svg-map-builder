@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
-import { GeomType } from "../src/constants.js";
-import { clipGeometry } from "../src/clip.js";
-import { Bounds } from "../src/bounds.js";
+import { GeomType } from "../lib/constants.js";
+import { clipGeometry } from "../lib/clip.js";
+import { Bounds } from "../lib/bounds.js";
 
 describe("clipGeometry", function() {
   it("clips points", function() {

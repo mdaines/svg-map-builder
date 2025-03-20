@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
-import { Icon } from "../src/icon.js";
-import { MarkerLayer } from "../src/marker-layer.js";
-import { Layout } from "../src/layout.js";
+import { Icon } from "../lib/icon.js";
+import { MarkerLayer } from "../lib/marker-layer.js";
+import { Layout } from "../lib/layout.js";
 import { JSDOM } from "jsdom";
 import { getGeoJSONSource } from "./helpers.js";
 

@@ -1,4 +1,7 @@
 import { GeomType } from "./constants.js";
+import { type Feature } from "./feature.js";
+import { type Bounds } from "./bounds.js";
+import { type Point } from "./point.js";
 
 // This is a modified version of the clip() function in geojson-vt.
 
@@ -18,26 +21,26 @@ import { GeomType } from "./constants.js";
 // TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
 // THIS SOFTWARE.
 
-export function clipGeometry(feature, bounds) {
+export function clipGeometry(feature: Feature, bounds: Bounds): Point[][] {
   if (feature.type === GeomType.POINT) {
-    const newX = [];
-    const newY = [];
+    const newX: Point[] = [];
+    const newY: Point[] = [];
 
     clipPoints(feature.geometry[0], newX, bounds.minX, bounds.maxX, 0);
     clipPoints(newX, newY, bounds.minY, bounds.maxY, 1);
 
     return [newY];
   } else if (feature.type === GeomType.LINESTRING) {
-    const newX = [];
-    const newY = [];
+    const newX: Point[][] = [];
+    const newY: Point[][] = [];
 
     clipLines(feature.geometry, newX, bounds.minX, bounds.maxX, 0, false);
     clipLines(newX, newY, bounds.minY, bounds.maxY, 1, false);
 
     return newY;
   } else if (feature.type === GeomType.POLYGON) {
-    const newX = [];
-    const newY = [];
+    const newX: Point[][] = [];
+    const newY: Point[][] = [];
 
     clipLines(feature.geometry, newX, bounds.minX, bounds.maxX, 0, true);
     clipLines(newX, newY, bounds.minY, bounds.maxY, 1, true);
@@ -48,7 +51,7 @@ export function clipGeometry(feature, bounds) {
   }
 }
 
-function clipPoints(geom, newGeom, k1, k2, axis) {
+function clipPoints(geom: Point[], newGeom: Point[], k1: number, k2: number, axis: number) {
     for (let i = 0; i < geom.length; i += 1) {
         const a = axis === 0 ? geom[i].x : geom[i].y;
 
@@ -58,9 +61,9 @@ function clipPoints(geom, newGeom, k1, k2, axis) {
     }
 }
 
-function clipLine(geom, newGeom, k1, k2, axis, isPolygon) {
+function clipLine(geom: Point[], newGeom: Point[][], k1: number, k2: number, axis: number, isPolygon: boolean) {
 
-    let slice = [];
+    let slice: Point[] = [];
     const intersect = axis === 0 ? intersectX : intersectY;
     let t;
 
@@ -122,26 +125,26 @@ function clipLine(geom, newGeom, k1, k2, axis, isPolygon) {
     }
 }
 
-function clipLines(geom, newGeom, k1, k2, axis, isPolygon) {
+function clipLines(geom: Point[][], newGeom: Point[][], k1: number, k2: number, axis: number, isPolygon: boolean) {
     for (const line of geom) {
         clipLine(line, newGeom, k1, k2, axis, isPolygon);
     }
 }
 
-function addPoint(out, x, y) {
+function addPoint(out: Point[], x: number, y: number) {
     out.push({
       x: Math.round(x),
       y: Math.round(y)
     });
 }
 
-function intersectX(out, ax, ay, bx, by, x) {
+function intersectX(out: Point[], ax: number, ay: number, bx: number, by: number, x: number) {
     const t = (x - ax) / (bx - ax);
     addPoint(out, x, ay + (by - ay) * t);
     return t;
 }
 
-function intersectY(out, ax, ay, bx, by, y) {
+function intersectY(out: Point[], ax: number, ay: number, bx: number, by: number, y: number) {
     const t = (y - ay) / (by - ay);
     addPoint(out, ax + (bx - ax) * t, y);
     return t;

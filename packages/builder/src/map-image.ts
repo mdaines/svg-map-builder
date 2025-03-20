@@ -1,15 +1,30 @@
+import { type Layout } from "./layout.js";
+import { type Icon } from "./icon.js";
+import { type Layer } from "./layer.js";
+
 export class MapImage {
-  constructor({ layout, icons = {}, layers }) {
+  layout: Layout;
+  icons: Record<string, Icon>;
+  layers: Layer[];
+
+  /**
+   * @param options
+   */
+  constructor({ layout, icons = {}, layers }: {
+    layout: Layout,
+    icons: Record<string, Icon>,
+    layers: Layer[]
+  }) {
     this.layout = layout;
     this.icons = icons;
     this.layers = layers;
   }
 
-  async render(document) {
+  async render(document: Document): Promise<SVGSVGElement> {
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 
-    svg.setAttribute("width", this.layout.canvasBounds.width);
-    svg.setAttribute("height", this.layout.canvasBounds.height);
+    svg.setAttribute("width", String(this.layout.canvasBounds.width));
+    svg.setAttribute("height", String(this.layout.canvasBounds.height));
     svg.setAttribute("viewBox", `${this.layout.canvasBounds.minX} ${this.layout.canvasBounds.minY} ${this.layout.canvasBounds.width} ${this.layout.canvasBounds.height}`);
 
     let hasDefs = false;
@@ -19,8 +34,8 @@ export class MapImage {
     for (const [id, icon] of Object.entries(this.icons)) {
       const symbolElement = document.createElementNS("http://www.w3.org/2000/svg", "symbol");
       symbolElement.setAttribute("id", id);
-      symbolElement.setAttribute("width", icon.width);
-      symbolElement.setAttribute("height", icon.height);
+      symbolElement.setAttribute("width", String(icon.width));
+      symbolElement.setAttribute("height", String(icon.height));
 
       symbolElement.appendChild(this.icons[id].render({ document }));
 

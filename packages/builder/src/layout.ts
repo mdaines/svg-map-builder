@@ -1,7 +1,10 @@
 import { Bounds } from "./bounds.js";
 import { SimpleTransform } from "./simple-transform.js";
+import { type Point } from "./point.js";
+import { type TileIdentifier } from "./tile-identifier.js";
+import { type TileSource } from "./tile-source.js";
 
-function boundsTransform(fromBounds, toBounds) {
+function boundsTransform(fromBounds: Bounds, toBounds: Bounds): SimpleTransform {
   let scale;
 
   if (fromBounds.width == 0) {
@@ -18,12 +21,12 @@ function boundsTransform(fromBounds, toBounds) {
     .translate(-fromBounds.x, -fromBounds.y);
 }
 
-function pixelAlignedTransform(transform, tileLength, canvasBounds) {
+function pixelAlignedTransform(transform: SimpleTransform, tileLength: number, canvasBounds: Bounds): SimpleTransform {
   const info = new TilePlacementInfo(transform, tileLength);
 
   // Find the tile at the center of the canvas bounds
 
-  const tileId = [
+  const tileId: TileIdentifier = [
     info.zoomLevel,
     Math.floor((canvasBounds.midX - transform.tx) / (transform.a / info.tileCount)),
     Math.floor((canvasBounds.midY - transform.ty) / (transform.a / info.tileCount))
@@ -52,7 +55,13 @@ function pixelAlignedTransform(transform, tileLength, canvasBounds) {
 }
 
 class TilePlacementInfo {
-  constructor(transform, tileLength) {
+  transform: SimpleTransform;
+  tileLength: number;
+  zoom: number;
+  zoomLevel: number;
+  tileCount: number;
+
+  constructor(transform: SimpleTransform, tileLength: number) {
     this.transform = transform;
     this.tileLength = tileLength;
 
@@ -61,7 +70,7 @@ class TilePlacementInfo {
     this.tileCount = 1 << this.zoomLevel;
   }
 
-  tileBounds(tileId) {
+  tileBounds(tileId: TileIdentifier): Bounds {
     const tileCount = 1 << tileId[0];
     const x = tileId[1] / tileCount;
     const y = tileId[2] / tileCount;
@@ -72,7 +81,13 @@ class TilePlacementInfo {
 }
 
 class TileRange {
-  constructor(transform, coverBounds, zoomLevel) {
+  zoomLevel: number;
+  tileLowerX: number;
+  tileLowerY: number;
+  tileUpperX: number;
+  tileUpperY: number;
+
+  constructor(transform: SimpleTransform, coverBounds: Bounds, zoomLevel: number) {
     this.zoomLevel = zoomLevel;
 
     // Convert the coverBounds to world coordinates and find the range of tiles that cover it.
@@ -86,8 +101,8 @@ class TileRange {
     this.tileUpperY = Math.max(0, Math.min(tileCount, Math.ceil(coverWorldBounds.maxY * tileCount)));
   }
 
-  get tileIds() {
-    const tileIds = [];
+  get tileIds(): TileIdentifier[] {
+    const tileIds: TileIdentifier[] = [];
 
     for (let y = this.tileLowerY; y < this.tileUpperY; y++) {
       for (let x = this.tileLowerX; x < this.tileUpperX; x++) {
@@ -98,8 +113,8 @@ class TileRange {
     return tileIds;
   }
 
-  overzoomedTileIds(maxZoom) {
-    if (typeof maxZoom === "undefined" || maxZoom > this.zoomLevel) {
+  overzoomedTileIds(maxZoom: number): TileIdentifier[] {
+    if (maxZoom > this.zoomLevel) {
       return this.tileIds;
     }
 
@@ -114,7 +129,7 @@ class TileRange {
     const tileUpperX = Math.ceil(this.tileUpperX / Math.pow(2, shift));
     const tileUpperY = Math.ceil(this.tileUpperY / Math.pow(2, shift));
 
-    const tileIds = [];
+    const tileIds: TileIdentifier[] = [];
 
     for (let y = tileLowerY; y < tileUpperY; y++) {
       for (let x = tileLowerX; x < tileUpperX; x++) {
@@ -127,7 +142,34 @@ class TileRange {
 }
 
 export class Layout {
-  static camera({ center, zoom, width, height, tileLength = 512 }) {
+  /** @internal */
+  canvasBounds: Bounds;
+
+  /** @internal */
+  transform: SimpleTransform;
+
+  /** @internal */
+  tileLength: number;
+
+  /** @internal */
+  tileInfo: TilePlacementInfo;
+
+  /** @internal */
+  backgroundBounds: Bounds;
+
+  /** @internal */
+  tileRange: TileRange;
+
+  /**
+   * @param options
+   */
+  static camera({ center, zoom, width, height, tileLength = 512 }: {
+    center: Point,
+    zoom: number,
+    width: number,
+    height: number,
+    tileLength: number
+  }) {
     const canvasBounds = new Bounds(0, 0, width, height);
 
     const scale = Math.pow(2, zoom) * tileLength;
@@ -145,7 +187,16 @@ export class Layout {
     return new this(canvasBounds, adjustedTransform, tileLength);
   }
 
-  static box({ bounds, width, height, padding = 0, tileLength = 512 }) {
+  /**
+   * @param options
+   */
+  static box({ bounds, width, height, padding = 0, tileLength = 512 }: {
+    bounds: Bounds,
+    width: number,
+    height: number,
+    padding: number,
+    tileLength: number
+  }) {
     if (bounds.isNull) {
       throw new Error("geometry bounds is null");
     }
@@ -178,7 +229,8 @@ export class Layout {
     return new this(canvasBounds, adjustedTransform, tileLength);
   }
 
-  constructor(canvasBounds, transform, tileLength) {
+  /** @internal */
+  constructor(canvasBounds: Bounds, transform: SimpleTransform, tileLength: number) {
     this.canvasBounds = canvasBounds;
     this.transform = transform;
     this.tileLength = tileLength;
@@ -204,21 +256,25 @@ export class Layout {
     this.tileRange = new TileRange(this.transform, this.backgroundBounds, this.tileInfo.zoomLevel);
   }
 
+  /** @internal */
   get zoom() {
     return this.tileInfo.zoom;
   }
 
+  /** @internal */
   get tileIds() {
     return this.tileRange.tileIds;
   }
 
-  async overzoomedTileIds(source) {
+  /** @internal */
+  async overzoomedTileIds(source: TileSource) {
     const { maxZoom } = await source.getMetadata();
 
     return this.tileRange.overzoomedTileIds(maxZoom);
   }
 
-  tileBounds(tileId) {
+  /** @internal */
+  tileBounds(tileId: TileIdentifier) {
     return this.tileInfo.tileBounds(tileId);
   }
 }

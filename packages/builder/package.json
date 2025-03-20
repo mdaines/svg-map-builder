@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "exports": "./index.js",
+  "exports": "./lib/index.js",
   "dependencies": {
     "@mapbox/vector-tile": "^2.0.3",
     "@turf/bbox": "^7.2.0",
@@ -11,11 +11,17 @@
     "pbf": "^4.0.1"
   },
   "devDependencies": {
+    "@types/geojson-vt": "^3.2.5",
+    "@types/node": "^22.13.10",
     "jsdom": "^25.0.1",
     "mocha": "^10.7.3",
-    "pmtiles": "^4.2.1"
+    "pmtiles": "^4.2.1",
+    "typedoc": "^0.28.1",
+    "typescript": "^5.8.2"
   },
   "scripts": {
+    "docs": "typedoc src/index.ts",
+    "build": "tsc",
     "test": "mocha --recursive --extension \".test.js\""
   }
 }
