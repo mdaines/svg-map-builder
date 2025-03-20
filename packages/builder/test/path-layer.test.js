@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { PathLayer } from "../src/path-layer.js";
-import { Layout } from "../src/layout.js";
+import { PathLayer } from "../lib/path-layer.js";
+import { Layout } from "../lib/layout.js";
 import { JSDOM } from "jsdom";
 import { getGeoJSONSource } from "./helpers.js";
 

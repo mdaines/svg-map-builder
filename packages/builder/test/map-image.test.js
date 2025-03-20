@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
-import { BackgroundLayer } from "../src/background-layer.js";
-import { MapImage } from "../src/map-image.js";
-import { Icon } from "../src/icon.js";
-import { Layout } from "../src/layout.js";
+import { BackgroundLayer } from "../lib/background-layer.js";
+import { MapImage } from "../lib/map-image.js";
+import { Icon } from "../lib/icon.js";
+import { Layout } from "../lib/layout.js";
 import { JSDOM } from "jsdom";
 
 describe("MapImage", function() {

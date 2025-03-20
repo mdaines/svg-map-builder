@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { Bounds } from "../src/bounds.js";
+import { Bounds } from "../lib/bounds.js";
 
 describe("Bounds", function() {
   it("constructor", function() {

@@ -1,6 +1,12 @@
 import { Bounds } from "./bounds.js";
+import { type Point } from "./point.js";
 
+/** @internal */
 export class SimpleTransform {
+  a: number;
+  tx: number;
+  ty: number;
+
   constructor(a = 1, tx = 0, ty = 0) {
     this.a = a;
     this.tx = tx;
@@ -23,7 +29,7 @@ export class SimpleTransform {
     );
   }
 
-  concat(t) {
+  concat(t: SimpleTransform) {
     return new SimpleTransform(
       this.a * t.a,
       this.a * t.tx + this.tx,
@@ -31,7 +37,7 @@ export class SimpleTransform {
     );
   }
 
-  scale(s) {
+  scale(s: number) {
     return new SimpleTransform(
       this.a * s,
       this.tx,
@@ -39,7 +45,7 @@ export class SimpleTransform {
     );
   }
 
-  translate(dx, dy) {
+  translate(dx: number, dy: number) {
     return new SimpleTransform(
       this.a,
       this.a * dx + this.tx,
@@ -47,14 +53,14 @@ export class SimpleTransform {
     );
   }
 
-  convertPoint({ x, y }) {
+  convertPoint({ x, y }: Point) {
     return {
       x: this.a * x + this.tx,
       y: this.a * y + this.ty
     };
   }
 
-  convertBounds(bounds) {
+  convertBounds(bounds: Bounds) {
     return new Bounds(
       this.a * bounds.minX + this.tx,
       this.a * bounds.minY + this.ty,
@@ -63,7 +69,10 @@ export class SimpleTransform {
     );
   }
 
-  convertSize({ width, height }) {
+  /**
+   * @param options
+   */
+  convertSize({ width, height }: { width: number, height: number }) {
     return {
       width: this.a * width,
       height: this.a * height

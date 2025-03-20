@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
-import { GeoJSONSource } from "../src/geojson-source.js";
-import { Bounds } from "../src/bounds.js";
-import { GeomType } from "../src/constants.js";
-import { Layout } from "../src/layout.js";
+import { GeoJSONSource } from "../lib/geojson-source.js";
+import { Bounds } from "../lib/bounds.js";
+import { GeomType } from "../lib/constants.js";
+import { Layout } from "../lib/layout.js";
 import { getFixture } from "./helpers.js";
 
 describe("GeoJSONSource", function() {

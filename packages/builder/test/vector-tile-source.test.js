@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { PMTiles } from "pmtiles";
-import { Bounds } from "../src/bounds.js";
-import { VectorTileSource } from "../src/vector-tile-source.js";
-import { NodeFileArchiveSource } from "../src/node-file-archive-source.js";
+import { Bounds } from "../lib/bounds.js";
+import { VectorTileSource } from "../lib/vector-tile-source.js";
+import { NodeFileArchiveSource } from "../lib/node-file-archive-source.js";
 import { fixturePath } from "./helpers.js";
 
 describe("VectorTileSource", function() {

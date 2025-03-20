@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { SimpleTransform } from "../src/simple-transform.js";
-import { Bounds } from "../src/bounds.js";
+import { SimpleTransform } from "../lib/simple-transform.js";
+import { Bounds } from "../lib/bounds.js";
 
 describe("SimpleTransform", function() {
   describe("constructor", function() {

@@ -1,9 +1,16 @@
+import { type Point } from "./point.js";
+
 export class Bounds {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+
   static get null() {
     return new this(Infinity, Infinity, Infinity, Infinity);
   }
 
-  constructor(minX, minY, maxX, maxY) {
+  constructor(minX: number, minY: number, maxX: number, maxY: number) {
     this.minX = minX;
     this.minY = minY;
     this.maxX = maxX;
@@ -38,7 +45,7 @@ export class Bounds {
     return this.minY + this.height * 0.5;
   }
 
-  contains(point) {
+  contains(point: Point) {
     if (this.isNull) {
       return false;
     }
@@ -46,7 +53,7 @@ export class Bounds {
     return point.x >= this.minX && point.x <= this.maxX && point.y >= this.minY && point.y <= this.maxY;
   }
 
-  intersection(other) {
+  intersection(other: Bounds) {
     if (this.isNull || other.isNull) {
       return Bounds.null;
     }
@@ -63,7 +70,7 @@ export class Bounds {
     return new Bounds(minX, minY, maxX, maxY);
   }
 
-  union(other) {
+  union(other: Bounds) {
     if (this.isNull) {
       return new Bounds(other.minX, other.minY, other.maxX, other.maxY);
     }
@@ -80,7 +87,7 @@ export class Bounds {
     return new Bounds(minX, minY, maxX, maxY);
   }
 
-  insetBy(dMinX, dMinY = dMinX, dMaxX = dMinX, dMaxY = dMinY) {
+  insetBy(dMinX: number, dMinY: number = dMinX, dMaxX: number = dMinX, dMaxY: number = dMinY) {
     if (dMinX + dMaxX > this.width || dMinY + dMaxY > this.height) {
       return Bounds.null;
     }
@@ -88,11 +95,11 @@ export class Bounds {
     return new Bounds(this.minX + dMinX, this.minY + dMinY, this.maxX - dMaxX, this.maxY - dMaxY);
   }
 
-  offsetBy(dx, dy) {
+  offsetBy(dx: number, dy: number) {
     return new Bounds(this.minX + dx, this.minY + dy, this.maxX + dx, this.maxY + dy);
   }
 
-  centeredAt(cx, cy) {
+  centeredAt(cx: number, cy: number) {
     return new Bounds(cx - this.width * 0.5, cy - this.height * 0.5, cx + this.width * 0.5, cy + this.height * 0.5);
   }
 }

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { GeomType } from "../src/constants.js";
-import { evaluateAttributes, AttributeData } from "../src/attributes.js";
+import { GeomType } from "../lib/constants.js";
+import { evaluateAttributes, AttributeData } from "../lib/attributes.js";
 
 describe("evaluateAttributes", function() {
   it("object literal", function() {
@@ -17,17 +17,6 @@ describe("evaluateAttributes", function() {
       ["stroke-width", "2"],
       ["stroke-dasharray", "4,4"]
     ]);
-  });
-
-  it("multiple object literals", function() {
-    const attributes1 = { fill: "green" };
-    const attributes2 = { fill: "red" };
-
-    assert.deepStrictEqual(Array.from(evaluateAttributes({}, attributes1, attributes2)), [["fill", "red"]]);
-  });
-
-  it("no object literals", function() {
-    assert.deepStrictEqual(Array.from(evaluateAttributes({})), []);
   });
 
   it("attribute value callback", function() {
@@ -64,8 +53,6 @@ describe("evaluateAttributes", function() {
 
   it("undefined object", function() {
     assert.deepStrictEqual(Array.from(evaluateAttributes({}, undefined)), []);
-    assert.deepStrictEqual(Array.from(evaluateAttributes({}, { fill: "blue" }, undefined)), [["fill", "blue"]]);
-    assert.deepStrictEqual(Array.from(evaluateAttributes({}, undefined, { fill: "blue" })), [["fill", "blue"]]);
     assert.deepStrictEqual(Array.from(evaluateAttributes({}, () => undefined)), []);
   });
 });

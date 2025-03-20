@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { convertCoordinate, convertBounds } from "../src/convert.js";
-import { Bounds } from "../src/bounds.js";
+import { convertCoordinate, convertBounds } from "../lib/convert.js";
+import { Bounds } from "../lib/bounds.js";
 
 describe("convertCoordinate", function() {
   it("returns the expected result", function() {

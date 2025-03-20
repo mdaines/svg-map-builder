@@ -2,32 +2,47 @@ import { GeomType } from "./constants.js";
 import { evaluateAttributes, evaluateEntry, AttributeData } from "./attributes.js";
 import { clipGeometry } from "./clip.js";
 import { Bounds } from "./bounds.js";
+import { type AttributeEntry, type Attributes } from "./attributes.js";
+import { type Layer } from "./layer.js";
+import { type TileSource } from "./tile-source.js";
+import { type Layout } from "./layout.js";
+import { type Feature } from "./feature.js";
+import { type Tile } from "./tile.js";
+import { type Point } from "./point.js";
 
-class ClippedFeature {
-  constructor(feature, clipBounds) {
+class ClippedFeature implements Feature {
+  feature: Feature;
+  clipBounds: Bounds;
+
+  constructor(feature: Feature, clipBounds: Bounds) {
     this.feature = feature;
     this.clipBounds = clipBounds;
   }
 
-  get id() {
+  get id(): any {
     return this.feature.id;
   }
 
-  get type() {
+  get type(): GeomType {
     return this.feature.type;
   }
 
-  get properties() {
+  get properties(): Record<string, any> {
     return this.feature.properties;
   }
 
-  get geometry() {
+  get geometry(): Point[][] {
     return clipGeometry(this.feature, this.clipBounds);
   }
 }
 
-class ClippedTile {
-  constructor(tile, bounds, viewbox, clipBounds, bufferLength) {
+class ClippedTile implements Tile {
+  tile: Tile;
+  bounds: Bounds;
+  viewbox: Bounds;
+  clipBounds: Bounds;
+
+  constructor(tile: Tile, bounds: Bounds, viewbox: Bounds, clipBounds: Bounds, bufferLength: number) {
     this.tile = tile;
 
     // convert clip bounds to tile coordinates
@@ -51,20 +66,22 @@ class ClippedTile {
     this.clipBounds = tileClipBounds.insetBy(-tileBufferLength, -tileBufferLength);
   }
 
-  get features() {
+  get extent(): number {
+    return this.tile.extent;
+  }
+
+  get features(): Iterable<Feature> {
     return {
-      tile: this.tile,
-      clipBounds: this.clipBounds,
-      *[Symbol.iterator]() {
+      [Symbol.iterator]: (function*(this: ClippedTile) {
         for (const feature of this.tile.features) {
           yield new ClippedFeature(feature, this.clipBounds);
         }
-      }
+      }.bind(this))
     };
   }
 }
 
-function clippedTiles(layout, source, bufferLength) {
+export function clippedTiles(layout: Layout, source: TileSource, bufferLength: number) {
   return {
     async *[Symbol.asyncIterator]() {
       const clipBounds = layout.backgroundBounds;
@@ -88,8 +105,20 @@ function clippedTiles(layout, source, bufferLength) {
   }
 }
 
-export class PathLayer {
-  constructor({ visible, source, filter, attributes, clipBufferLength = 8 }) {
+export class PathLayer implements Layer {
+  visible: AttributeEntry<boolean>;
+  source: TileSource;
+  filter: (data: AttributeData) => boolean;
+  attributes: Attributes;
+  clipBufferLength: number;
+
+  constructor({ visible, source, filter, attributes, clipBufferLength = 8 }: {
+    visible: AttributeEntry<boolean>,
+    source: TileSource,
+    filter: (data: AttributeData) => boolean,
+    attributes: Attributes,
+    clipBufferLength: number
+  }) {
     this.visible = visible;
     this.source = source;
     this.filter = filter;
@@ -97,7 +126,11 @@ export class PathLayer {
     this.clipBufferLength = clipBufferLength;
   }
 
-  async render({ document, layout }) {
+  /** @internal */
+  async render({ document, layout }: {
+    document: Document,
+    layout: Layout
+  }): Promise<Node | undefined> {
     const layerAttributeData = new AttributeData(undefined, layout);
 
     if (typeof this.visible !== "undefined" && !evaluateEntry(layerAttributeData, this.visible)) {
@@ -135,12 +168,12 @@ export class PathLayer {
         for (const ring of feature.geometry) {
           d.push("m");
 
-          ring.forEach(({ x, y }) => {
+          for (const { x, y } of ring) {
             d.push([x - lastX, y - lastY].join(","));
 
             lastX = x;
             lastY = y;
-          });
+          }
 
           if (feature.type === GeomType.POLYGON) {
             d.push("z");
@@ -163,10 +196,10 @@ export class PathLayer {
         continue;
       }
 
-      tileSvg.setAttribute("x", tile.bounds.x);
-      tileSvg.setAttribute("y", tile.bounds.y);
-      tileSvg.setAttribute("width", tile.bounds.width);
-      tileSvg.setAttribute("height", tile.bounds.height);
+      tileSvg.setAttribute("x", String(tile.bounds.x));
+      tileSvg.setAttribute("y", String(tile.bounds.y));
+      tileSvg.setAttribute("width", String(tile.bounds.width));
+      tileSvg.setAttribute("height", String(tile.bounds.height));
       tileSvg.setAttribute("viewBox", `${tile.viewbox.minX} ${tile.viewbox.minY} ${tile.viewbox.width} ${tile.viewbox.height}`);
 
       fragment.appendChild(tileSvg);

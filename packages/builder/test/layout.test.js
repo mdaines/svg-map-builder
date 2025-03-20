@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { Layout } from "../src/layout.js";
-import { Bounds } from "../src/bounds.js";
+import { Layout } from "../lib/layout.js";
+import { Bounds } from "../lib/bounds.js";
 
 describe("Layout", function() {
   describe("camera", function() {
