@@ -1,0 +1,27 @@
+name: Test builder package
+
+on:
+  push:
+    paths:
+      - "packages/builder/**"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.x"
+
+      - name: "Test"
+        run: |
+          npm clean-install
+          npm run build
+          npm test
+        working-directory: packages/builder
