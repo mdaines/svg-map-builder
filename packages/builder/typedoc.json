@@ -1,3 +1,9 @@
 {
-  "excludeInternal": true
+  "excludeInternal": true,
+  "externalSymbolLinkMappings": {
+    "pmtiles": {
+      "PMTiles": "https://pmtiles.io/typedoc/classes/PMTiles.html",
+      "Source": "https://pmtiles.io/typedoc/interfaces/Source.html"
+    }
+  }
 }
