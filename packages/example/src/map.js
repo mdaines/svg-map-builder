@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { PMTiles } from "pmtiles";
-import { BackgroundLayer, GeomType, GeoJSONSource, Icon, Layout, MapImage, MarkerLayer, NodeFileArchiveSource, PathLayer, VectorTileSource } from "@mdaines/svg-map-builder";
+import { BackgroundLayer, GeomType, GeoJSONTileSource, Icon, Layout, MapImage, MarkerLayer, NodeFileArchiveSource, PathLayer, VectorTileSource } from "@mdaines/svg-map-builder";
 
 const icons = {
   circle: new Icon({
@@ -156,7 +156,7 @@ export function render(document) {
 
   const routeUrl = new URL("../data/tokaido.geojson", import.meta.url);
   const routeData = readFileSync(routeUrl);
-  const routeSource = new GeoJSONSource(JSON.parse(routeData));
+  const routeSource = new GeoJSONTileSource(JSON.parse(routeData));
 
   const layout = Layout.box({
     bounds: routeSource.bounds,

@@ -3,11 +3,11 @@ import { Icon } from "../lib/icon.js";
 import { MarkerLayer } from "../lib/marker-layer.js";
 import { Layout } from "../lib/layout.js";
 import { JSDOM } from "jsdom";
-import { getGeoJSONSource } from "./helpers.js";
+import { getGeoJSONTileSource } from "./helpers.js";
 
 describe("MarkerLayer", function() {
   it("render", async function() {
-    const source = getGeoJSONSource("point.geojson");
+    const source = getGeoJSONTileSource("point.geojson");
 
     const circleIcon = new Icon({
       content: () => undefined,
@@ -145,7 +145,7 @@ describe("MarkerLayer", function() {
   });
 
   it("render with missing properties", async function() {
-    const source = getGeoJSONSource("point-properties.geojson");
+    const source = getGeoJSONTileSource("point-properties.geojson");
 
     const circleIcon = new Icon({
       content: () => undefined,
@@ -265,7 +265,7 @@ describe("MarkerLayer", function() {
   });
 
   it("render with missing icon", async function() {
-    const source = getGeoJSONSource("point.geojson");
+    const source = getGeoJSONTileSource("point.geojson");
 
     const layer = new MarkerLayer({
       source,
@@ -310,7 +310,7 @@ describe("MarkerLayer", function() {
   });
 
   it("render without text", async function() {
-    const source = getGeoJSONSource("point.geojson");
+    const source = getGeoJSONTileSource("point.geojson");
 
     const circleIcon = new Icon({
       content: () => undefined,
@@ -360,7 +360,7 @@ describe("MarkerLayer", function() {
   });
 
   it("render without icon", async function() {
-    const source = getGeoJSONSource("point.geojson");
+    const source = getGeoJSONTileSource("point.geojson");
 
     const layer = new MarkerLayer({
       source,
@@ -402,7 +402,7 @@ describe("MarkerLayer", function() {
   });
 
   it("render attributes based on layout", async function() {
-    const source = getGeoJSONSource("point.geojson");
+    const source = getGeoJSONTileSource("point.geojson");
 
     const circleIcon = new Icon({
       content: () => undefined,
@@ -468,7 +468,7 @@ describe("MarkerLayer", function() {
   });
 
   it("renders only one marker for each position", async function() {
-    const source = getGeoJSONSource("zero-point.geojson");
+    const source = getGeoJSONTileSource("zero-point.geojson");
 
     const layer = new MarkerLayer({
       source,

@@ -1,14 +1,14 @@
 import assert from "node:assert/strict";
-import { GeoJSONSource } from "../lib/geojson-source.js";
+import { GeoJSONTileSource } from "../lib/geojson-tile-source.js";
 import { Bounds } from "../lib/bounds.js";
 import { GeomType } from "../lib/constants.js";
 import { Layout } from "../lib/layout.js";
 import { getFixture } from "./helpers.js";
 
-describe("GeoJSONSource", function() {
+describe("GeoJSONTileSource", function() {
   describe("getMetadata", function() {
     it("returns metadata", async function() {
-      const source = new GeoJSONSource(getFixture("point.geojson"), { maxZoom: 5 });
+      const source = new GeoJSONTileSource(getFixture("point.geojson"), { maxZoom: 5 });
       const metadata = await source.getMetadata();
 
       assert.strictEqual(metadata.maxZoom, 5);
@@ -17,7 +17,7 @@ describe("GeoJSONSource", function() {
 
   describe("bounds", function() {
     it("bounds in world coordinates", function() {
-      const source = new GeoJSONSource(getFixture("polygon.geojson"));
+      const source = new GeoJSONTileSource(getFixture("polygon.geojson"));
 
       assert.deepStrictEqual(source.bounds, new Bounds(
         0.5,
@@ -30,7 +30,7 @@ describe("GeoJSONSource", function() {
 
   describe("getTile", function() {
     it("returns a tile", async function() {
-      const source = new GeoJSONSource(getFixture("point.geojson"));
+      const source = new GeoJSONTileSource(getFixture("point.geojson"));
 
       const tile = await source.getTile([0, 0, 0]);
 
@@ -40,7 +40,7 @@ describe("GeoJSONSource", function() {
     });
 
     it("returns undefined if no tile exists", async function() {
-      const source = new GeoJSONSource(getFixture("point.geojson"));
+      const source = new GeoJSONTileSource(getFixture("point.geojson"));
 
       assert.strictEqual(await source.getTile([0, 0, -1]), undefined);
     });
@@ -48,7 +48,7 @@ describe("GeoJSONSource", function() {
 
   describe("feature", function() {
     it("correctly wraps the feature's id, type, and properties", async function() {
-      const source = new GeoJSONSource(getFixture("point.geojson"));
+      const source = new GeoJSONTileSource(getFixture("point.geojson"));
 
       const tile = await source.getTile([0, 0, 0]);
 

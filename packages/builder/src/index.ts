@@ -2,7 +2,7 @@ export { BackgroundLayer } from "./background-layer.js";
 export { Bounds } from "./bounds.js";
 export { GeomType } from "./constants.js";
 export { Icon } from "./icon.js";
-export { GeoJSONSource } from "./geojson-source.js";
+export { GeoJSONTileSource } from "./geojson-tile-source.js";
 export { Layout } from "./layout.js";
 export { MapImage } from "./map-image.js";
 export { MarkerLayer } from "./marker-layer.js";

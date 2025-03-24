@@ -77,7 +77,7 @@ class TileWrapper implements Tile {
   }
 }
 
-export class GeoJSONSource implements TileSource {
+export class GeoJSONTileSource implements TileSource {
   /** @internal */
   tileIndex: any;
 
