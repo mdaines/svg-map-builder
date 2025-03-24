@@ -5,5 +5,8 @@
       "PMTiles": "https://pmtiles.io/typedoc/classes/PMTiles.html",
       "Source": "https://pmtiles.io/typedoc/interfaces/Source.html"
     }
-  }
+  },
+  "plugin": [
+    "typedoc-plugin-mdn-links"
+  ]
 }
