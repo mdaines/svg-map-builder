@@ -2,12 +2,12 @@ import assert from "node:assert/strict";
 import { PathLayer } from "../lib/path-layer.js";
 import { Layout } from "../lib/layout.js";
 import { JSDOM } from "jsdom";
-import { getGeoJSONSource } from "./helpers.js";
+import { getGeoJSONTileSource } from "./helpers.js";
 
 describe("PathLayer", function() {
   describe("render", function() {
     it("renders path elements for a polygon", async function() {
-      const source = getGeoJSONSource("polygon.geojson");
+      const source = getGeoJSONTileSource("polygon.geojson");
 
       const layer = new PathLayer({ source });
 
@@ -40,7 +40,7 @@ describe("PathLayer", function() {
     });
 
     it("renders path elements for a line", async function() {
-      const source = getGeoJSONSource("line.geojson");
+      const source = getGeoJSONTileSource("line.geojson");
 
       const layer = new PathLayer({ source });
 
@@ -74,7 +74,7 @@ describe("PathLayer", function() {
     });
 
     it("renders elements with attributes depending on data", async function() {
-      const source = getGeoJSONSource("polygon.geojson");
+      const source = getGeoJSONTileSource("polygon.geojson");
 
       const layer = new PathLayer({
         source,
@@ -125,7 +125,7 @@ describe("PathLayer", function() {
     });
 
     it("renders elements with attributes depending on layout", async function() {
-      const source = getGeoJSONSource("polygon.geojson");
+      const source = getGeoJSONTileSource("polygon.geojson");
 
       const layer = new PathLayer({
         source,
@@ -174,7 +174,7 @@ describe("PathLayer", function() {
     });
 
     it("renders overzoomed tiles", async function() {
-      const source = getGeoJSONSource("polygon.geojson", { maxZoom: 0 });
+      const source = getGeoJSONTileSource("polygon.geojson", { maxZoom: 0 });
 
       const layer = new PathLayer({ source });
 
@@ -207,7 +207,7 @@ describe("PathLayer", function() {
     });
 
     it("renders clipped tiles", async function() {
-      const source = getGeoJSONSource("line.geojson");
+      const source = getGeoJSONTileSource("line.geojson");
 
       const layer = new PathLayer({ source });
 
