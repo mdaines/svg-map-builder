@@ -1,5 +1,6 @@
 export { BackgroundLayer } from "./background-layer.js";
 export { Bounds } from "./bounds.js";
+export { DebugLayer } from "./debug-layer.js";
 export { GeomType } from "./constants.js";
 export { Icon } from "./icon.js";
 export { GeoJSONTileSource } from "./geojson-tile-source.js";
@@ -8,7 +9,6 @@ export { MapImage } from "./map-image.js";
 export { MarkerLayer } from "./marker-layer.js";
 export { NodeFileArchiveSource } from "./node-file-archive-source.js";
 export { PathLayer } from "./path-layer.js";
-export { TileLayer } from "./tile-layer.js";
 export { VectorTileSource } from "./vector-tile-source.js";
 export { convertCoordinate, convertBounds } from "./convert.js";
 
