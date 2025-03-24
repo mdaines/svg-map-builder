@@ -114,7 +114,7 @@ class TileRange {
   }
 
   overzoomedTileIds(maxZoom: number): TileIdentifier[] {
-    if (maxZoom > this.zoomLevel) {
+    if (maxZoom >= this.zoomLevel) {
       return this.tileIds;
     }
 
@@ -124,10 +124,10 @@ class TileRange {
 
     const shift = this.zoomLevel - maxZoom;
 
-    const tileLowerX = Math.floor(this.tileLowerX / Math.pow(2, shift));
-    const tileLowerY = Math.floor(this.tileLowerY / Math.pow(2, shift));
-    const tileUpperX = Math.ceil(this.tileUpperX / Math.pow(2, shift));
-    const tileUpperY = Math.ceil(this.tileUpperY / Math.pow(2, shift));
+    const tileLowerX = this.tileLowerX >> shift;
+    const tileLowerY = this.tileLowerY >> shift;
+    const tileUpperX = this.tileUpperX >> shift;
+    const tileUpperY = this.tileUpperY >> shift;
 
     const tileIds: TileIdentifier[] = [];
 
