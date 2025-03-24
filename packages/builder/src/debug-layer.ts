@@ -4,19 +4,16 @@ import { type AttributeEntry, type Attributes } from "./attributes.js";
 import { type Layer } from "./layer.js";
 import { type Layout } from "./layout.js";
 
-export class TileLayer implements Layer {
+export class DebugLayer implements Layer {
   visible: AttributeEntry<boolean>;
-  attributes: Attributes;
 
   /**
    * @param options
    */
-  constructor({ visible, attributes }: {
-    visible: AttributeEntry<boolean>,
-    attributes: Attributes
+  constructor({ visible }: {
+    visible: AttributeEntry<boolean>
   }) {
     this.visible = visible;
-    this.attributes = attributes;
   }
 
   /** @internal */
@@ -32,8 +29,6 @@ export class TileLayer implements Layer {
 
     const fragment = document.createDocumentFragment();
 
-    const rectAttributes = evaluateAttributes(layerAttributeData, this.attributes);
-
     for (const tileId of layout.tileIds) {
       const tileBounds = layout.tileBounds(tileId);
 
@@ -42,10 +37,8 @@ export class TileLayer implements Layer {
       rect.setAttribute("y", String(tileBounds.y));
       rect.setAttribute("width", String(tileBounds.width));
       rect.setAttribute("height", String(tileBounds.height));
-
-      for (const [name, value] of rectAttributes) {
-        rect.setAttribute(name, value);
-      }
+      rect.setAttribute("fill", "none");
+      rect.setAttribute("stroke", "yellow");
 
       fragment.appendChild(rect);
     }
