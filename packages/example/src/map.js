@@ -43,8 +43,7 @@ function buildLayers(basemapArchive, routeSource, options) {
       }
     }),
 
-    new PathLayer({
-      source: new VectorTileSource(basemapArchive, "landcover"),
+    new PathLayer(new VectorTileSource(basemapArchive, "landcover"), {
       attributes: {
         fill: ({ get }) => {
           switch (get("kind")) {
@@ -67,16 +66,14 @@ function buildLayers(basemapArchive, routeSource, options) {
       }
     }),
 
-    new PathLayer({
-      source: new VectorTileSource(basemapArchive, "water"),
+    new PathLayer(new VectorTileSource(basemapArchive, "water"), {
       filter: ({ type }) => type === GeomType.POLYGON,
       attributes: {
         fill: "#80deea"
       }
     }),
 
-    new PathLayer({
-      source: new VectorTileSource(basemapArchive, "roads"),
+    new PathLayer(new VectorTileSource(basemapArchive, "roads"), {
       attributes: {
         fill: "none",
         stroke: "#fff",
@@ -85,8 +82,7 @@ function buildLayers(basemapArchive, routeSource, options) {
       }
     }),
 
-    new PathLayer({
-      source: new VectorTileSource(basemapArchive, "boundaries"),
+    new PathLayer(new VectorTileSource(basemapArchive, "boundaries"), {
       filter: ({ get }) => get("kind_detail") <= 2,
       attributes: {
         fill: "none",
@@ -97,8 +93,7 @@ function buildLayers(basemapArchive, routeSource, options) {
       }
     }),
 
-    new PathLayer({
-      source: new VectorTileSource(basemapArchive, "boundaries"),
+    new PathLayer(new VectorTileSource(basemapArchive, "boundaries"), {
       filter: ({ get }) => get("kind_detail") > 2,
       attributes: {
         fill: "none",
@@ -109,8 +104,7 @@ function buildLayers(basemapArchive, routeSource, options) {
       }
     }),
 
-    new PathLayer({
-      source: routeSource,
+    new PathLayer(routeSource, {
       filter: ({ type }) => type === GeomType.LINESTRING,
       attributes: {
         fill: "none",
@@ -123,8 +117,7 @@ function buildLayers(basemapArchive, routeSource, options) {
       }
     }),
 
-    new MarkerLayer({
-      source: routeSource,
+    new MarkerLayer(routeSource, {
       icon: {
         id: ({ get }) => get("icon", "circle"),
         attributes: {

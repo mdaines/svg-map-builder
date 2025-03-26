@@ -1,20 +1,17 @@
-import { evaluateAttributes, evaluateEntry, AttributeData, type Attributes, type AttributeEntry } from "./attributes.js";
+import { evaluateOption, evaluateAttributes, LayerData, type LayerAttributes, type LayerOption } from "./attributes.js";
 import { type Layer } from "./layer.js";
 import { type Layout } from "./layout.js";
 
 export class BackgroundLayer implements Layer {
-  visible: AttributeEntry<boolean>;
-  attributes: Attributes;
+  visible: LayerOption<boolean>;
+  attributes: LayerAttributes | undefined;
 
-  /**
-   * @param options
-   */
-  constructor({ visible, attributes }: {
-    visible: AttributeEntry<boolean>,
-    attributes: Attributes
+  constructor(options?: {
+    visible?: LayerOption<boolean>,
+    attributes?: LayerAttributes
   }) {
-    this.visible = visible;
-    this.attributes = attributes;
+    this.visible = options?.visible ?? true;
+    this.attributes = options?.attributes;
   }
 
   /** @internal */
@@ -22,9 +19,9 @@ export class BackgroundLayer implements Layer {
     document: Document,
     layout: Layout
   }) {
-    const layerAttributeData = new AttributeData(undefined, layout);
+    const layerData = new LayerData(layout);
 
-    if (typeof this.visible !== "undefined" && !evaluateEntry(layerAttributeData, this.visible)) {
+    if (evaluateOption(layerData, this.visible) == false) {
       return;
     }
 
@@ -34,7 +31,7 @@ export class BackgroundLayer implements Layer {
     rect.setAttribute("width", String(layout.backgroundBounds.width));
     rect.setAttribute("height", String(layout.backgroundBounds.height));
 
-    for (const [name, value] of evaluateAttributes(layerAttributeData, this.attributes)) {
+    for (const [name, value] of evaluateAttributes(layerData, this.attributes)) {
       rect.setAttribute(name, value);
     }
 

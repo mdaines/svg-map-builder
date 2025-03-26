@@ -13,7 +13,7 @@ export { VectorTileSource } from "./vector-tile-source.js";
 export { convertCoordinate, convertBounds } from "./convert.js";
 
 export { type Layer } from "./layer.js";
-export { type Attributes, type AttributeEntry, type AttributeData } from "./attributes.js";
+export { type DataOption, type LayerData, type FeatureData, type LayerOption, type FeatureOption, type AttributeValue, type Attributes, type LayerAttributes, type FeatureAttributes } from "./attributes.js";
 export { type Point } from "./point.js";
 export { type Feature } from "./feature.js";
 export { type TileSource } from "./tile-source.js";
