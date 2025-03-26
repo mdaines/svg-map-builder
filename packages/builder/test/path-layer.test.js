@@ -9,7 +9,7 @@ describe("PathLayer", function() {
     it("renders path elements for a polygon", async function() {
       const source = getGeoJSONTileSource("polygon.geojson");
 
-      const layer = new PathLayer({ source });
+      const layer = new PathLayer(source);
 
       const layout = Layout.camera({
         center: { x: 0.5, y: 0.5 },
@@ -42,7 +42,7 @@ describe("PathLayer", function() {
     it("renders path elements for a line", async function() {
       const source = getGeoJSONTileSource("line.geojson");
 
-      const layer = new PathLayer({ source });
+      const layer = new PathLayer(source);
 
       const layout = Layout.camera({
         center: { x: 0.5, y: 0.5 },
@@ -76,8 +76,7 @@ describe("PathLayer", function() {
     it("renders elements with attributes depending on data", async function() {
       const source = getGeoJSONTileSource("polygon.geojson");
 
-      const layer = new PathLayer({
-        source,
+      const layer = new PathLayer(source, {
         filter: ({ get }) => get("natural") == "water",
         attributes: {
           fill: ({ get }) => get("depth") == 1 ? "lightblue" : "blue",
@@ -127,8 +126,7 @@ describe("PathLayer", function() {
     it("renders elements with attributes depending on layout", async function() {
       const source = getGeoJSONTileSource("polygon.geojson");
 
-      const layer = new PathLayer({
-        source,
+      const layer = new PathLayer(source, {
         attributes: {
           fill: ({ zoom }) => zoom == 0 ? "green" : "blue"
         }
@@ -176,7 +174,7 @@ describe("PathLayer", function() {
     it("renders overzoomed tiles", async function() {
       const source = getGeoJSONTileSource("polygon.geojson", { maxZoom: 0 });
 
-      const layer = new PathLayer({ source });
+      const layer = new PathLayer(source);
 
       const layout = Layout.camera({
         center: { x: 0.5, y: 0.5 },
@@ -209,7 +207,7 @@ describe("PathLayer", function() {
     it("renders clipped tiles", async function() {
       const source = getGeoJSONTileSource("line.geojson");
 
-      const layer = new PathLayer({ source });
+      const layer = new PathLayer(source);
 
       const layout = Layout.camera({
         center: { x: 0.5, y: 0.5 },

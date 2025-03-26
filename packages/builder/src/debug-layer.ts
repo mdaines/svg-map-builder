@@ -1,19 +1,16 @@
 import { GeomType } from "./constants.js";
-import { evaluateAttributes, evaluateEntry, AttributeData } from "./attributes.js";
-import { type AttributeEntry, type Attributes } from "./attributes.js";
+import { evaluateOption, LayerData } from "./attributes.js";
+import { type LayerOption } from "./attributes.js";
 import { type Layer } from "./layer.js";
 import { type Layout } from "./layout.js";
 
 export class DebugLayer implements Layer {
-  visible: AttributeEntry<boolean>;
+  visible: LayerOption<boolean>;
 
-  /**
-   * @param options
-   */
-  constructor({ visible }: {
-    visible: AttributeEntry<boolean>
+  constructor(options?: {
+    visible: LayerOption<boolean>
   }) {
-    this.visible = visible;
+    this.visible = options?.visible ?? true;
   }
 
   /** @internal */
@@ -21,9 +18,9 @@ export class DebugLayer implements Layer {
     document: Document,
     layout: Layout
   }): Promise<Node | undefined> {
-    const layerAttributeData = new AttributeData(undefined, layout);
+    const layerData = new LayerData(layout);
 
-    if (typeof this.visible !== "undefined" && !evaluateEntry(layerAttributeData, this.visible)) {
+    if (evaluateOption(layerData, this.visible) == false) {
       return;
     }
 

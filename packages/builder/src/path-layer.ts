@@ -1,8 +1,8 @@
 import { GeomType } from "./constants.js";
-import { evaluateAttributes, evaluateEntry, AttributeData } from "./attributes.js";
+import { evaluateAttributes, evaluateOption, LayerData, FeatureData } from "./attributes.js";
+import { type LayerOption, type FeatureOption, type FeatureAttributes } from "./attributes.js";
 import { clipGeometry } from "./clip.js";
 import { Bounds } from "./bounds.js";
-import { type AttributeEntry, type Attributes } from "./attributes.js";
 import { type Layer } from "./layer.js";
 import { type TileSource } from "./tile-source.js";
 import { type Layout } from "./layout.js";
@@ -106,24 +106,26 @@ export function clippedTiles(layout: Layout, source: TileSource, bufferLength: n
 }
 
 export class PathLayer implements Layer {
-  visible: AttributeEntry<boolean>;
   source: TileSource;
-  filter: (data: AttributeData) => boolean;
-  attributes: Attributes;
+  visible: LayerOption<boolean>;
+  filter: ((data: FeatureData) => boolean) | undefined;
+  attributes: FeatureAttributes | undefined;
   clipBufferLength: number;
 
-  constructor({ visible, source, filter, attributes, clipBufferLength = 8 }: {
-    visible: AttributeEntry<boolean>,
+  constructor(
     source: TileSource,
-    filter: (data: AttributeData) => boolean,
-    attributes: Attributes,
-    clipBufferLength: number
-  }) {
-    this.visible = visible;
+    options?: {
+      visible?: LayerOption<boolean>,
+      filter?: (data: FeatureData) => boolean,
+      attributes?: FeatureAttributes,
+      clipBufferLength?: number
+    }
+  ) {
     this.source = source;
-    this.filter = filter;
-    this.attributes = attributes;
-    this.clipBufferLength = clipBufferLength;
+    this.visible = options?.visible ?? true;
+    this.filter = options?.filter;
+    this.attributes = options?.attributes;
+    this.clipBufferLength = options?.clipBufferLength ?? 8;
   }
 
   /** @internal */
@@ -131,9 +133,9 @@ export class PathLayer implements Layer {
     document: Document,
     layout: Layout
   }): Promise<Node | undefined> {
-    const layerAttributeData = new AttributeData(undefined, layout);
+    const layerData = new LayerData(layout);
 
-    if (typeof this.visible !== "undefined" && !evaluateEntry(layerAttributeData, this.visible)) {
+    if (evaluateOption(layerData, this.visible) == false) {
       return;
     }
 
@@ -149,9 +151,9 @@ export class PathLayer implements Layer {
           continue;
         }
 
-        const attributeData = new AttributeData(feature, layout);
+        const featureData = new FeatureData(feature, layout);
 
-        if (typeof this.filter !== "undefined" && !this.filter(attributeData)) {
+        if (typeof this.filter !== "undefined" && !this.filter(featureData)) {
           continue;
         }
 
@@ -183,7 +185,7 @@ export class PathLayer implements Layer {
         const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
         path.setAttribute("d", d.join(" "));
 
-        for (const [name, value] of evaluateAttributes(attributeData, this.attributes)) {
+        for (const [name, value] of evaluateAttributes(featureData, this.attributes)) {
           path.setAttribute(name, value);
         }
 

@@ -1,30 +1,28 @@
 import { GeomType } from "./constants.js";
 import { Bounds } from "./bounds.js";
-import { evaluateAttributes, evaluateEntry, AttributeData } from "./attributes.js";
-import { type AttributeEntry, type Attributes } from "./attributes.js";
+import { evaluateOption, evaluateAttributes, LayerData, FeatureData } from "./attributes.js";
+import { type LayerOption, type FeatureOption, type FeatureAttributes, type LayerAttributes } from "./attributes.js";
 import { type Layer } from "./layer.js";
 import { type Icon } from "./icon.js";
 import { type TileSource } from "./tile-source.js";
 import { type Layout } from "./layout.js";
-// import { type Feature } from "./feature.js";
-// import { type Tile } from "./tile.js";
 import { type Point } from "./point.js";
 
 class Marker {
   featureSortKey: number | undefined;
-  attributeData: AttributeData;
+  featureData: FeatureData;
   point: Point;
   positionKey: number;
 
-  constructor(featureSortKey: number | undefined, attributeData: AttributeData, point: Point, positionKey: number) {
+  constructor(featureSortKey: number | undefined, featureData: FeatureData, point: Point, positionKey: number) {
     this.featureSortKey = featureSortKey;
-    this.attributeData = attributeData;
+    this.featureData = featureData;
     this.point = point;
     this.positionKey = positionKey;
   }
 }
 
-async function collectMarkers(layout: Layout, source: TileSource, filter: (data: AttributeData) => boolean, sortKey: (data: AttributeData) => number | undefined): Promise<Marker[]> {
+async function collectMarkers(layout: Layout, source: TileSource, filter?: (data: FeatureData) => boolean, sortKey?: (data: FeatureData) => number | undefined): Promise<Marker[]> {
   const markers = [];
 
   for (const tileId of await layout.overzoomedTileIds(source)) {
@@ -41,16 +39,16 @@ async function collectMarkers(layout: Layout, source: TileSource, filter: (data:
         continue;
       }
 
-      const attributeData = new AttributeData(feature, layout);
+      const featureData = new FeatureData(feature, layout);
 
-      if (typeof filter !== "undefined" && !filter(attributeData)) {
+      if (typeof filter !== "undefined" && !filter(featureData)) {
         continue;
       }
 
       let featureSortKey;
 
       if (typeof sortKey !== "undefined") {
-        featureSortKey = sortKey(attributeData);
+        featureSortKey = sortKey(featureData);
       }
 
       for (const geometry of feature.geometry) {
@@ -62,7 +60,7 @@ async function collectMarkers(layout: Layout, source: TileSource, filter: (data:
         if (layout.backgroundBounds.contains(point)) {
           const positionKey = point.y * layout.backgroundBounds.width + point.x;
 
-          markers.push(new Marker(featureSortKey, attributeData, point, positionKey));
+          markers.push(new Marker(featureSortKey, featureData, point, positionKey));
         }
       }
     }
@@ -86,43 +84,42 @@ async function collectMarkers(layout: Layout, source: TileSource, filter: (data:
 }
 
 export type MarkerLayerIconOptions = {
-  id: AttributeEntry<string>,
-  attributes: Attributes
+  id?: FeatureOption<string | undefined>,
+  attributes?: FeatureAttributes
 }
 
 export type MarkerLayerTextOptions = {
-  content: AttributeEntry<string>,
-  attributes: Attributes
+  content?: FeatureOption<string | undefined>,
+  attributes?: FeatureAttributes
 }
 
 export class MarkerLayer implements Layer {
-  visible: AttributeEntry<boolean>;
   source: TileSource;
-  filter: (data: AttributeData) => boolean;
-  sortKey: (data: AttributeData) => number | undefined;
-  attributes: Attributes;
-  icon: MarkerLayerIconOptions;
-  text: MarkerLayerTextOptions;
+  visible: LayerOption<boolean>;
+  filter: ((data: FeatureData) => boolean) | undefined;
+  sortKey: ((data: FeatureData) => number | undefined) | undefined;
+  attributes: FeatureAttributes | undefined;
+  icon: MarkerLayerIconOptions | undefined;
+  text: MarkerLayerTextOptions | undefined;
 
-  /**
-   * @param options
-   */
-  constructor({ visible, source, filter, sortKey, attributes, icon, text }: {
-    visible: AttributeEntry<boolean>,
+  constructor(
     source: TileSource,
-    filter: (data: AttributeData) => boolean,
-    sortKey: (data: AttributeData) => number | undefined,
-    attributes: Attributes,
-    icon: MarkerLayerIconOptions,
-    text: MarkerLayerTextOptions
-  }) {
-    this.visible = visible;
+    options?: {
+      visible?: LayerOption<boolean>,
+      filter?: (data: FeatureData) => boolean,
+      sortKey?: (data: FeatureData) => number | undefined,
+      attributes?: FeatureAttributes,
+      icon?: MarkerLayerIconOptions,
+      text?: MarkerLayerTextOptions
+    }
+  ) {
     this.source = source;
-    this.filter = filter;
-    this.sortKey = sortKey;
-    this.attributes = attributes;
-    this.icon = icon;
-    this.text = text;
+    this.visible = options?.visible ?? true;
+    this.filter = options?.filter;
+    this.sortKey = options?.sortKey;
+    this.attributes = options?.attributes;
+    this.icon = options?.icon;
+    this.text = options?.text;
   }
 
   /** @internal */
@@ -131,9 +128,9 @@ export class MarkerLayer implements Layer {
     layout: Layout,
     icons: Record<string, Icon>
   }): Promise<Node | undefined> {
-    const layerAttributeData = new AttributeData(undefined, layout);
+    const layerData = new LayerData(layout);
 
-    if (typeof this.visible !== "undefined" && !evaluateEntry(layerAttributeData, this.visible)) {
+    if (evaluateOption(layerData, this.visible) == false) {
       return;
     }
 
@@ -150,7 +147,7 @@ export class MarkerLayer implements Layer {
 
       const markerGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
 
-      for (const [name, value] of evaluateAttributes(marker.attributeData, this.attributes)) {
+      for (const [name, value] of evaluateAttributes(marker.featureData, this.attributes)) {
         markerGroup.setAttribute(name, value);
       }
 
@@ -158,7 +155,7 @@ export class MarkerLayer implements Layer {
         let iconId;
 
         if (typeof this.icon.id === "function") {
-          iconId = this.icon.id(marker.attributeData);
+          iconId = this.icon.id(marker.featureData);
         } else if (typeof this.icon.id !== "undefined") {
           iconId = this.icon.id;
         }
@@ -172,7 +169,7 @@ export class MarkerLayer implements Layer {
             iconUse.setAttribute("x", String(Math.round(marker.point.x - icon.width * 0.5)));
             iconUse.setAttribute("y", String(Math.round(marker.point.y - icon.height * 0.5)));
 
-            for (const [name, value] of evaluateAttributes(marker.attributeData, this.icon.attributes)) {
+            for (const [name, value] of evaluateAttributes(marker.featureData, this.icon.attributes)) {
               iconUse.setAttribute(name, value);
             }
 
@@ -185,7 +182,7 @@ export class MarkerLayer implements Layer {
         let textContent;
 
         if (typeof this.text.content === "function") {
-          textContent = this.text.content(marker.attributeData);
+          textContent = this.text.content(marker.featureData);
         } else if (typeof this.text.content !== "undefined") {
           textContent = this.text.content;
         }
@@ -198,7 +195,7 @@ export class MarkerLayer implements Layer {
           const textNode = document.createTextNode(textContent);
           text.appendChild(textNode);
 
-          for (const [name, value] of evaluateAttributes(marker.attributeData, this.text.attributes)) {
+          for (const [name, value] of evaluateAttributes(marker.featureData, this.text.attributes)) {
             text.setAttribute(name, value);
           }
 

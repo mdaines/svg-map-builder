@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { GeomType } from "../lib/constants.js";
-import { evaluateAttributes, AttributeData } from "../lib/attributes.js";
+import { evaluateAttributes, FeatureData, LayerData } from "../lib/attributes.js";
 
 describe("evaluateAttributes", function() {
   it("object literal", function() {
@@ -57,9 +57,9 @@ describe("evaluateAttributes", function() {
   });
 });
 
-describe("AttributeData", function() {
+describe("FeatureData", function() {
   describe("feature and layout", function() {
-    function makeAttributeData() {
+    function makeFeatureData() {
       const feature = {
         id: 123,
         type: GeomType.POINT,
@@ -73,23 +73,23 @@ describe("AttributeData", function() {
         zoom: 2
       };
 
-      return new AttributeData(feature, layout);
+      return new FeatureData(feature, layout);
     }
 
     it("id", function() {
-      const data = makeAttributeData();
+      const data = makeFeatureData();
 
       assert.strictEqual(data.id, 123);
     });
 
     it("type", function() {
-      const data = makeAttributeData();
+      const data = makeFeatureData();
 
       assert.strictEqual(data.type, GeomType.POINT);
     });
 
     it("properties", function() {
-      const data = makeAttributeData();
+      const data = makeFeatureData();
 
       assert.deepStrictEqual(data.properties, {
         natural: "water",
@@ -99,25 +99,25 @@ describe("AttributeData", function() {
 
     describe("get", function() {
       it("returns the value of a property", function() {
-        const data = makeAttributeData();
+        const data = makeFeatureData();
 
         assert.strictEqual(data.get("natural"), "water");
       });
 
       it("returns undefined if there is no property with the name", function() {
-        const data = makeAttributeData();
+        const data = makeFeatureData();
 
         assert.strictEqual(data.get("something"), undefined);
       });
 
       it("returns a fallback value if there is no property with the name", function() {
-        const data = makeAttributeData();
+        const data = makeFeatureData();
 
         assert.strictEqual(data.get("something", 456), 456);
       });
 
       it("can be used with destructuring assignment", function() {
-        const data = makeAttributeData();
+        const data = makeFeatureData();
 
         const { get } = data;
 
@@ -127,19 +127,19 @@ describe("AttributeData", function() {
 
     describe("has", function() {
       it("returns true if there is a property with the name", function() {
-        const data = makeAttributeData();
+        const data = makeFeatureData();
 
         assert.strictEqual(data.has("natural"), true);
       });
 
       it("returns false if there is no property with the name", function() {
-        const data = makeAttributeData();
+        const data = makeFeatureData();
 
         assert.strictEqual(data.has("something"), false);
       });
 
       it("can be used with destructuring assignment", function() {
-        const data = makeAttributeData();
+        const data = makeFeatureData();
 
         const { has } = data;
 
@@ -149,13 +149,13 @@ describe("AttributeData", function() {
 
     describe("zoom", function() {
       it("returns the value of the layout's zoom property", function() {
-        const data = makeAttributeData();
+        const data = makeFeatureData();
 
         assert.strictEqual(data.zoom, 2);
       });
 
       it("can be used with destructuring assignment", function() {
-        const data = makeAttributeData();
+        const data = makeFeatureData();
 
         const { zoom } = data;
 
@@ -163,26 +163,20 @@ describe("AttributeData", function() {
       });
     });
   });
+});
 
-  describe("layout only", function() {
-    function makeAttributeData() {
-      const layout = {
-        zoom: 2
-      };
+describe("LayerData", function() {
+  function makeLayerData() {
+    const layout = {
+      zoom: 2
+    };
 
-      return new AttributeData(undefined, layout);
-    }
+    return new LayerData(layout);
+  }
 
-    it("getters", function() {
-      const data = makeAttributeData();
+  it("getters", function() {
+    const data = makeLayerData();
 
-      assert.strictEqual(data.id, undefined);
-      assert.strictEqual(data.type, undefined);
-      assert.strictEqual(data.properties, undefined);
-      assert.strictEqual(data.get("natural"), undefined);
-      assert.strictEqual(data.get("natural", "water"), "water");
-      assert.strictEqual(data.has("natural"), false);
-      assert.strictEqual(data.zoom, 2);
-    });
+    assert.strictEqual(data.zoom, 2);
   });
 });

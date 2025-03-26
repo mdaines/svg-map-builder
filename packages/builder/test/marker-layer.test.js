@@ -21,8 +21,7 @@ describe("MarkerLayer", function() {
       height: 8
     });
 
-    const layer = new MarkerLayer({
-      source,
+    const layer = new MarkerLayer(source, {
       sortKey: ({ get }) => get("priority"),
       attributes: {
         dataOverlap: ""
@@ -153,8 +152,7 @@ describe("MarkerLayer", function() {
       height: 8
     });
 
-    const layer = new MarkerLayer({
-      source,
+    const layer = new MarkerLayer(source, {
       icon: {
         id: ({ get }) => get("icon", "circle")
       },
@@ -267,8 +265,7 @@ describe("MarkerLayer", function() {
   it("render with missing icon", async function() {
     const source = getGeoJSONTileSource("point.geojson");
 
-    const layer = new MarkerLayer({
-      source,
+    const layer = new MarkerLayer(source, {
       icon: {
         id: "something"
       },
@@ -318,8 +315,7 @@ describe("MarkerLayer", function() {
       height: 8
     });
 
-    const layer = new MarkerLayer({
-      source,
+    const layer = new MarkerLayer(source, {
       icon: {
         id: "circle"
       }
@@ -362,8 +358,7 @@ describe("MarkerLayer", function() {
   it("render without icon", async function() {
     const source = getGeoJSONTileSource("point.geojson");
 
-    const layer = new MarkerLayer({
-      source,
+    const layer = new MarkerLayer(source, {
       text: {
         content: ({ get }) => get("name")
       }
@@ -410,8 +405,7 @@ describe("MarkerLayer", function() {
       height: 8
     });
 
-    const layer = new MarkerLayer({
-      source,
+    const layer = new MarkerLayer(source, {
       icon: {
         id: "circle",
         attributes: {
@@ -470,8 +464,7 @@ describe("MarkerLayer", function() {
   it("renders only one marker for each position", async function() {
     const source = getGeoJSONTileSource("zero-point.geojson");
 
-    const layer = new MarkerLayer({
-      source,
+    const layer = new MarkerLayer(source, {
       text: {
         content: "blah"
       }

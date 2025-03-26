@@ -2,17 +2,77 @@ import { type Feature } from "./feature.js";
 import { type Layout } from "./layout.js";
 import { type GeomType } from "./constants.js";
 
-export type AttributeEntry<Value> = ((data: AttributeData) => Value) | Value;
+export class FeatureData {
+  #feature: Feature;
+  #layout: Layout;
 
-export type Attributes =
-  ((data: AttributeData) => Record<string, any> | undefined) |
-  Record<string, AttributeEntry<any>>
+  get = function(this: FeatureData, name: string, fallback: any) {
+    if (Object.hasOwn(this.properties, name)) {
+      return this.properties[name];
+    }
+
+    return fallback;
+  }.bind(this);
+
+  has = function(this: FeatureData, name: string) {
+    return Object.hasOwn(this.properties, name);
+  }.bind(this);
+
+  constructor(feature: Feature, layout: Layout) {
+    this.#feature = feature;
+    this.#layout = layout;
+  }
+
+  get id(): any {
+    return this.#feature.id;
+  }
+
+  get type(): GeomType {
+    return this.#feature.type;
+  }
+
+  get properties(): Record<string, any> {
+    return this.#feature.properties;
+  }
+
+  get zoom(): number {
+    return this.#layout.zoom;
+  }
+}
+
+export class LayerData {
+  #layout: Layout;
+
+  constructor(layout: Layout) {
+    this.#layout = layout;
+  }
+
+  get zoom(): number {
+    return this.#layout.zoom;
+  }
+}
+
+export type AttributeValue = string | number | boolean | null | undefined
+
+export type DataOption<Data, Value> = ((data: Data) => Value) | Value
+
+export type Attributes<Data> =
+  Record<string, DataOption<Data, AttributeValue>> |
+  DataOption<Data, Record<string, AttributeValue>>
+
+export type FeatureOption<Value> = DataOption<FeatureData, Value>
+
+export type LayerOption<Value> = DataOption<LayerData, Value>
+
+export type FeatureAttributes = Attributes<FeatureData>
+
+export type LayerAttributes = Attributes<LayerData>
 
 export function camelToDashed(name: string): string {
   return name.replace(/[A-Z]/g, "-$&").toLowerCase();
 }
 
-export function evaluateEntry<Value>(data: AttributeData, entry: AttributeEntry<Value>): Value {
+export function evaluateOption<Data, Value>(data: Data, entry: DataOption<Data, Value>): Value {
   if (entry instanceof Function) {
     return entry(data);
   } else {
@@ -20,7 +80,7 @@ export function evaluateEntry<Value>(data: AttributeData, entry: AttributeEntry<
   }
 }
 
-export function evaluateAttributes(data: AttributeData, attrs: Attributes): Map<string, string> {
+export function evaluateAttributes<Data>(data: Data, attrs: Attributes<Data> | undefined): Map<string, string> {
   const map = new Map();
 
   if (attrs instanceof Function) {
@@ -35,61 +95,13 @@ export function evaluateAttributes(data: AttributeData, attrs: Attributes): Map<
     }
   } else if (typeof attrs !== "undefined") {
     for (const [name, value] of Object.entries(attrs)) {
-      const evaluatedEntry = evaluateEntry(data, value);
+      const evaluatedOption = evaluateOption(data, value);
 
-      if (typeof evaluatedEntry !== "undefined") {
-        map.set(camelToDashed(name), String(evaluatedEntry));
+      if (typeof evaluatedOption !== "undefined") {
+        map.set(camelToDashed(name), String(evaluatedOption));
       }
     }
   }
 
   return map;
-}
-
-export class AttributeData {
-  #feature: Feature | undefined;
-  #layout: Layout;
-
-  get = function(this: AttributeData, name: string, fallback: any) {
-    if (typeof this.properties !== "undefined" && Object.hasOwn(this.properties, name)) {
-      return this.properties[name];
-    }
-
-    return fallback;
-  }.bind(this);
-
-  has = function(this: AttributeData, name: string) {
-    if (typeof this.properties !== "undefined") {
-      return Object.hasOwn(this.properties, name);
-    } else {
-      return false;
-    }
-  }.bind(this);
-
-  constructor(feature: Feature | undefined, layout: Layout) {
-    this.#feature = feature;
-    this.#layout = layout;
-  }
-
-  get id(): any {
-    if (typeof this.#feature !== "undefined") {
-      return this.#feature.id;
-    }
-  }
-
-  get type(): GeomType | undefined {
-    if (typeof this.#feature !== "undefined") {
-      return this.#feature.type;
-    }
-  }
-
-  get properties(): Record<string, any> | undefined {
-    if (typeof this.#feature !== "undefined") {
-      return this.#feature.properties;
-    }
-  }
-
-  get zoom(): number {
-    return this.#layout.zoom;
-  }
 }
