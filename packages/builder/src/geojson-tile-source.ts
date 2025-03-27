@@ -22,11 +22,11 @@ function mapRings(geometry: Coordinate[][]): Point[][] {
 class FeatureWrapper implements Feature {
   feature: geojsonvt.Feature;
 
-  constructor(feature: any) {
+  constructor(feature: geojsonvt.Feature) {
     this.feature = feature;
   }
 
-  get id() {
+  get id(): unknown {
     return this.feature.id;
   }
 
@@ -34,7 +34,7 @@ class FeatureWrapper implements Feature {
     return this.feature.type as unknown as GeomType;
   }
 
-  get properties(): Record<string, any> {
+  get properties(): Record<string, unknown> {
     // tags is declared in @types/geojson-vt as optional (ie, it may be undefined), but the GeoJSON spec says that the properties property must either be an object or null, and geojson-vt appears to just pass it through.
 
     if (this.feature.tags == null) {
@@ -58,10 +58,10 @@ class FeatureWrapper implements Feature {
 }
 
 class TileWrapper implements Tile {
-  tile: any;
+  tile: geojsonvt.Tile;
   extent: number;
 
-  constructor(tile: any, extent: number) {
+  constructor(tile: geojsonvt.Tile, extent: number) {
     this.tile = tile;
     this.extent = extent;
   }
@@ -83,7 +83,7 @@ export class GeoJSONTileSource implements TileSource {
 
   bounds: Bounds;
 
-  constructor(data: any, options: any) {
+  constructor(data: geojsonvt.Data, options: geojsonvt.Options) {
     this.tileIndex = geojsonvt(data, options);
     this.bounds = convertBounds(...(turf.bbox(data) as [number, number, number, number]));
   }
