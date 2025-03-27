@@ -6,7 +6,7 @@ export class FeatureData {
   #feature: Feature;
   #layout: Layout;
 
-  get = function(this: FeatureData, name: string, fallback: any) {
+  get = function(this: FeatureData, name: string, fallback: unknown): unknown {
     if (Object.hasOwn(this.properties, name)) {
       return this.properties[name];
     }
@@ -14,7 +14,7 @@ export class FeatureData {
     return fallback;
   }.bind(this);
 
-  has = function(this: FeatureData, name: string) {
+  has = function(this: FeatureData, name: string): boolean {
     return Object.hasOwn(this.properties, name);
   }.bind(this);
 
@@ -23,7 +23,7 @@ export class FeatureData {
     this.#layout = layout;
   }
 
-  get id(): any {
+  get id(): unknown {
     return this.#feature.id;
   }
 
@@ -31,7 +31,7 @@ export class FeatureData {
     return this.#feature.type;
   }
 
-  get properties(): Record<string, any> {
+  get properties(): Record<string, unknown> {
     return this.#feature.properties;
   }
 

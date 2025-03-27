@@ -19,7 +19,7 @@ class ClippedFeature implements Feature {
     this.clipBounds = clipBounds;
   }
 
-  get id(): any {
+  get id(): unknown {
     return this.feature.id;
   }
 
@@ -27,7 +27,7 @@ class ClippedFeature implements Feature {
     return this.feature.type;
   }
 
-  get properties(): Record<string, any> {
+  get properties(): Record<string, unknown> {
     return this.feature.properties;
   }
 
