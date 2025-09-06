@@ -39,7 +39,7 @@ Some ideas this project uses
 
 Vector tiles are drawn using nested `<svg>` elements, with the geometry using the coordinates in the tile.
 
-Emphasizes graphics coordinates, so it doesn't do any projection (except utility routines for converting to to web mercator).
+Emphasizes graphics coordinates, so it doesn't do any projection (except utility routines for converting from web mercator).
 
 Other than tile coordinates, it deals in _world coordinates,_ where the world is a square with 0,0 at the northwest and 1,1 at the southeast, and _canvas coordinates,_ the coordinate system in the outermost `<svg>` element.
 
